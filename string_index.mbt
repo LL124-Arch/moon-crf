@@ -1,19 +1,19 @@
 ///|
-/// A stable mapping from feature names to dense integer identifiers.
-pub struct FeatureIndex {
+/// A stable mapping from strings to dense integer identifiers.
+pub struct StringIndex {
   priv ids : Map[String, Int32]
   priv names : Array[String]
 }
 
 ///|
-/// Creates an empty feature index.
-pub fn FeatureIndex::new() -> FeatureIndex {
-  FeatureIndex::{ ids: Map([]), names: [], }
+/// Creates an empty string index.
+pub fn StringIndex::new() -> StringIndex {
+  StringIndex::{ ids: Map([]), names: [], }
 }
 
 ///|
 /// Returns the ID for `name`, assigning a new ID on first use.
-pub fn FeatureIndex::intern(self : FeatureIndex, name : String) -> Int32 {
+pub fn StringIndex::intern(self : StringIndex, name : String) -> Int32 {
   match self.ids.get(name) {
     Some(id) => id
     None => {
@@ -26,20 +26,20 @@ pub fn FeatureIndex::intern(self : FeatureIndex, name : String) -> Int32 {
 }
 
 ///|
-/// Looks up an existing feature ID without adding a new one.
-pub fn FeatureIndex::get(self : FeatureIndex, name : String) -> Int32? {
+/// Looks up an existing ID without adding a new one.
+pub fn StringIndex::get(self : StringIndex, name : String) -> Int32? {
   self.ids.get(name)
 }
 
 ///|
-/// Number of distinct features in the index.
-pub fn FeatureIndex::len(self : FeatureIndex) -> Int32 {
+/// Number of distinct strings in the index.
+pub fn StringIndex::len(self : StringIndex) -> Int32 {
   self.names.length()
 }
 
 ///|
-/// Resolves an ID back to its feature name.
-pub fn FeatureIndex::name(self : FeatureIndex, id : Int32) -> String? {
+/// Resolves an ID back to its original string.
+pub fn StringIndex::name(self : StringIndex, id : Int32) -> String? {
   self.names.get(id)
 }
 
@@ -51,7 +51,7 @@ pub fn FeatureIndex::name(self : FeatureIndex, id : Int32) -> String? {
 pub fn TemplateSet::extract_ids(
   self : TemplateSet,
   tokens : Array[String],
-  index : FeatureIndex,
+  index : StringIndex,
 ) -> Array[Array[Int32]] {
   let names = self.extract(tokens)
   let result : Array[Array[Int32]] = []
@@ -64,3 +64,11 @@ pub fn TemplateSet::extract_ids(
   }
   result
 }
+
+///|
+/// String index used for observation features.
+pub type FeatureIndex = StringIndex
+
+///|
+/// String index used for labels.
+pub type LabelIndex = StringIndex

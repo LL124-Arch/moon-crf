@@ -55,15 +55,6 @@ pub fn Dataset::from_conll(String) -> Self raise DatasetError
 pub fn Dataset::len(Self) -> Int
 pub fn Dataset::sequences(Self) -> ArrayView[Sequence]
 
-pub struct FeatureIndex {
-  // private fields
-}
-pub fn FeatureIndex::get(Self, String) -> Int?
-pub fn FeatureIndex::intern(Self, String) -> Int
-pub fn FeatureIndex::len(Self) -> Int
-pub fn FeatureIndex::name(Self, Int) -> String?
-pub fn FeatureIndex::new() -> Self
-
 pub struct LbfgsOptions {
   // private fields
 }
@@ -87,11 +78,22 @@ pub fn Sequence::len(Self) -> Int
 pub fn Sequence::new(Array[String], Array[String]) -> Self raise DatasetError
 pub fn Sequence::tokens(Self) -> ArrayView[String]
 
+#alias(FeatureIndex)
+#alias(LabelIndex)
+pub struct StringIndex {
+  // private fields
+}
+pub fn StringIndex::get(Self, String) -> Int?
+pub fn StringIndex::intern(Self, String) -> Int
+pub fn StringIndex::len(Self) -> Int
+pub fn StringIndex::name(Self, Int) -> String?
+pub fn StringIndex::new() -> Self
+
 pub struct TemplateSet {
   // private fields
 }
 pub fn TemplateSet::extract(Self, Array[String]) -> Array[Array[String]]
-pub fn TemplateSet::extract_ids(Self, Array[String], FeatureIndex) -> Array[Array[Int]]
+pub fn TemplateSet::extract_ids(Self, Array[String], StringIndex) -> Array[Array[Int]]
 pub fn TemplateSet::len(Self) -> Int
 pub fn TemplateSet::parse(Array[String]) -> Self raise TemplateError
 
