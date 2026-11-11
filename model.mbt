@@ -5,6 +5,7 @@ pub suberror ModelError {
   FeatureOutOfRange(Int32, Int32)
   LabelOutOfRange(Int32, Int32)
   LengthMismatch(Int32, Int32)
+  ParameterCount(Int32, Int32)
 }
 
 ///|
@@ -19,6 +20,8 @@ impl Show for ModelError with fn output(self, logger) {
       logger.write_string(
         "sequence has \{features} positions but \{labels} labels",
       )
+    ParameterCount(expected, actual) =>
+      logger.write_string("expected \{expected} parameters, found \{actual}")
   }
 }
 
@@ -34,6 +37,21 @@ pub struct CrfModel {
 }
 
 ///|
+/// Creates a zero-initialized model without validating the label count.
+fn CrfModel::new_unchecked(
+  num_labels : Int32,
+  num_features : Int32,
+) -> CrfModel {
+  let weights : Array[Array[Double]] = Array::makei(num_features, fn(_) {
+    Array::make(num_labels, 0.0)
+  })
+  let transitions : Array[Array[Double]] = Array::makei(num_labels, fn(_) {
+    Array::make(num_labels, 0.0)
+  })
+  CrfModel::{ num_labels, weights, transitions, }
+}
+
+///|
 /// Creates a zero-initialized model.
 pub fn CrfModel::new(
   num_labels : Int32,
@@ -42,13 +60,65 @@ pub fn CrfModel::new(
   if num_labels <= 0 {
     raise NoLabels
   }
-  let weights : Array[Array[Double]] = Array::makei(num_features, fn(_) {
-    Array::make(num_labels, 0.0)
-  })
-  let transitions : Array[Array[Double]] = Array::makei(num_labels, fn(_) {
-    Array::make(num_labels, 0.0)
-  })
-  CrfModel::{ num_labels, weights, transitions, }
+  CrfModel::new_unchecked(num_labels, num_features)
+}
+
+///|
+/// Flattens state weights followed by transition weights.
+///
+/// The state block is laid out as `feature * num_labels + label`, and the
+/// transition block follows it as `previous * num_labels + current`.
+pub fn CrfModel::to_parameters(self : CrfModel) -> Array[Double] {
+  let parameters : Array[Double] = []
+  for feature in 0..<self.weights.length() {
+    for label in 0..<self.num_labels {
+      parameters.push(self.weights[feature][label])
+    }
+  }
+  for previous in 0..<self.num_labels {
+    for current in 0..<self.num_labels {
+      parameters.push(self.transitions[previous][current])
+    }
+  }
+  parameters
+}
+
+///|
+/// Restores a model from a flat parameter vector without checking its length.
+fn CrfModel::from_parameters_unchecked(
+  parameters : Array[Double],
+  num_labels : Int32,
+  num_features : Int32,
+) -> CrfModel {
+  let model = CrfModel::new_unchecked(num_labels, num_features)
+  let mut index = 0
+  for feature in 0..<num_features {
+    for label in 0..<num_labels {
+      model.weights[feature][label] = parameters[index]
+      index += 1
+    }
+  }
+  for previous in 0..<num_labels {
+    for current in 0..<num_labels {
+      model.transitions[previous][current] = parameters[index]
+      index += 1
+    }
+  }
+  model
+}
+
+///|
+/// Restores a model from a flat parameter vector.
+pub fn CrfModel::from_parameters(
+  parameters : Array[Double],
+  num_labels : Int32,
+  num_features : Int32,
+) -> CrfModel raise ModelError {
+  let expected = num_features * num_labels + num_labels * num_labels
+  if parameters.length() != expected {
+    raise ParameterCount(expected, parameters.length())
+  }
+  CrfModel::from_parameters_unchecked(parameters, num_labels, num_features)
 }
 
 ///|
@@ -179,13 +249,26 @@ fn CrfModel::state_scores(
   self : CrfModel,
   features : Array[Array[Int32]],
 ) -> Array[Array[Double]] raise ModelError {
+  for feature_ids in features {
+    for feature in feature_ids {
+      self.check_feature(feature)
+    }
+  }
+  self.state_scores_unchecked(features)
+}
+
+///|
+/// Precomputes state scores for validated feature IDs.
+fn CrfModel::state_scores_unchecked(
+  self : CrfModel,
+  features : Array[Array[Int32]],
+) -> Array[Array[Double]] {
   let result : Array[Array[Double]] = []
   for feature_ids in features {
     let row : Array[Double] = []
     for label in 0..<self.num_labels {
       let mut total = 0.0
       for feature in feature_ids {
-        self.check_feature(feature)
         total += self.weights[feature][label]
       }
       row.push(total)

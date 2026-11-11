@@ -202,3 +202,52 @@ test "rejects models without labels" {
     _ => panic()
   }
 }
+
+///|
+fn expect_parameter_error(
+  parameters : Array[Double],
+  labels : Int32,
+  features : Int32,
+) -> @mooncrf.ModelError {
+  let _ = @mooncrf.CrfModel::from_parameters(parameters, labels, features) catch {
+    err => return err
+  }
+  panic()
+}
+
+///|
+test "parameters round-trip through the flat representation" {
+  let model = @mooncrf.CrfModel::new(2, 3)
+  model.set_weight(0, 0, 0.5)
+  model.set_weight(1, 1, -0.25)
+  model.set_weight(2, 0, 1.25)
+  model.set_transition(0, 1, 0.75)
+  model.set_transition(1, 0, -0.5)
+  let parameters = model.to_parameters()
+  assert_eq(parameters.length(), 10)
+  let restored = @mooncrf.CrfModel::from_parameters(parameters, 2, 3)
+  for feature in 0..<3 {
+    for label in 0..<2 {
+      assert_eq(restored.weight(feature, label), model.weight(feature, label))
+    }
+  }
+  for previous in 0..<2 {
+    for current in 0..<2 {
+      assert_eq(
+        restored.transition(previous, current),
+        model.transition(previous, current),
+      )
+    }
+  }
+}
+
+///|
+test "rejects wrong parameter counts" {
+  match expect_parameter_error([1.0], 2, 3) {
+    @mooncrf.ModelError::ParameterCount(expected, actual) => {
+      assert_eq(expected, 10)
+      assert_eq(actual, 1)
+    }
+    _ => panic()
+  }
+}

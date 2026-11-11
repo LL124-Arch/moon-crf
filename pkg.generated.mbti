@@ -16,6 +16,7 @@ pub suberror ModelError {
   FeatureOutOfRange(Int, Int)
   LabelOutOfRange(Int, Int)
   LengthMismatch(Int, Int)
+  ParameterCount(Int, Int)
 }
 
 pub suberror OptimizeError {
@@ -34,6 +35,7 @@ pub suberror TemplateError {
 pub struct CrfModel {
   // private fields
 }
+pub fn CrfModel::from_parameters(Array[Double], Int, Int) -> Self raise ModelError
 pub fn CrfModel::log_partition(Self, Array[Array[Int]]) -> Double raise ModelError
 pub fn CrfModel::log_probability(Self, Array[Array[Int]], Array[Int]) -> Double raise ModelError
 pub fn CrfModel::marginals(Self, Array[Array[Int]]) -> Array[Array[Double]] raise ModelError
@@ -44,6 +46,7 @@ pub fn CrfModel::score(Self, Array[Array[Int]], Array[Int]) -> Double raise Mode
 pub fn CrfModel::set_transition(Self, Int, Int, Double) -> Unit raise ModelError
 pub fn CrfModel::set_weight(Self, Int, Int, Double) -> Unit raise ModelError
 pub fn CrfModel::state_score(Self, Array[Int], Int) -> Double raise ModelError
+pub fn CrfModel::to_parameters(Self) -> Array[Double]
 pub fn CrfModel::transition(Self, Int, Int) -> Double raise ModelError
 pub fn CrfModel::viterbi(Self, Array[Array[Int]]) -> ViterbiResult raise ModelError
 pub fn CrfModel::weight(Self, Int, Int) -> Double raise ModelError
