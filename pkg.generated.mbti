@@ -58,12 +58,15 @@ pub fn CrfModel::weight(Self, Int, Int) -> Double raise ModelError
 pub struct CrfTrainer {
   // private fields
 }
+pub fn CrfTrainer::encode_tokens(Self, Array[String]) -> Array[Array[Int]]
 pub fn CrfTrainer::feature_name(Self, Int) -> String?
 pub fn CrfTrainer::from_dataset(Dataset, TemplateSet) -> Self raise TrainError
 pub fn CrfTrainer::label_name(Self, Int) -> String?
 pub fn CrfTrainer::num_features(Self) -> Int
 pub fn CrfTrainer::num_labels(Self) -> Int
 pub fn CrfTrainer::objective_and_gradient(Self, Array[Double], l2? : Double) -> (Double, Array[Double]) raise ModelError
+pub fn CrfTrainer::predict(Self, CrfModel, Array[String]) -> Array[String] raise ModelError
+pub fn CrfTrainer::train(Self, options? : LbfgsOptions, l2? : Double) -> TrainingResult raise OptimizeError
 
 pub struct Dataset {
   // private fields
@@ -111,8 +114,17 @@ pub struct TemplateSet {
 }
 pub fn TemplateSet::extract(Self, Array[String]) -> Array[Array[String]]
 pub fn TemplateSet::extract_ids(Self, Array[String], StringIndex) -> Array[Array[Int]]
+pub fn TemplateSet::extract_known_ids(Self, Array[String], StringIndex) -> Array[Array[Int]]
 pub fn TemplateSet::len(Self) -> Int
 pub fn TemplateSet::parse(Array[String]) -> Self raise TemplateError
+
+pub struct TrainingResult {
+  // private fields
+}
+pub fn TrainingResult::converged(Self) -> Bool
+pub fn TrainingResult::iterations(Self) -> Int
+pub fn TrainingResult::model(Self) -> CrfModel
+pub fn TrainingResult::objective(Self) -> Double
 
 pub struct ViterbiResult {
   // private fields

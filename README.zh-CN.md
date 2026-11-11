@@ -14,7 +14,7 @@
 - [x] 前向-后向推理
 - [x] Viterbi 解码
 - [x] L-BFGS 优化器
-- [ ] CRF 训练目标
+- [x] CRF 训练与预测
 - [ ] 模型序列化
 - [ ] 精确率 / 召回率 / F1 评测
 - [ ] 命令行工具
@@ -106,6 +106,22 @@ println(result.iterations())
 ```
 
 实现使用 two-loop recursion、Armijo 回溯线搜索，并在首步按梯度范数缩放步长。
+
+## 训练与预测
+
+`CrfTrainer` 用模板集把 CoNLL 数据集编码，并用带 L2 正则的负对数似然训练模型：
+
+```moonbit
+let dataset = @mooncrf.Dataset::from_conll("a X
+b Y
+")
+let templates = @mooncrf.TemplateSet::parse(["%x[0,0]"])
+let trainer = @mooncrf.CrfTrainer::from_dataset(dataset, templates)
+let result = trainer.train(l2=0.01)
+let labels = trainer.predict(result.model(), ["a", "b"])
+```
+
+预测时复用训练阶段的特征索引，未知特征会被跳过，不会改变模型参数布局。
 
 ## 参考与许可证
 

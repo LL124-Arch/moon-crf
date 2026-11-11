@@ -23,7 +23,7 @@ incrementally, with every feature covered by tests before it is merged.
 - [x] Forward-backward inference
 - [x] Viterbi decoding
 - [x] L-BFGS optimizer
-- [ ] CRF training objective
+- [x] CRF training and prediction
 - [ ] Model serialization
 - [ ] Precision / recall / F1 evaluation
 - [ ] Command-line interface
@@ -127,6 +127,23 @@ println(result.iterations())
 
 The optimizer uses the two-loop recursion, Armijo backtracking, and a
 first-step scaling based on the gradient norm.
+
+## Training
+
+`CrfTrainer` encodes a CoNLL dataset with a template set and trains a model
+with L2-regularized negative log-likelihood:
+
+```moonbit
+let dataset = @mooncrf.Dataset::from_conll("a X
+b Y
+")
+let templates = @mooncrf.TemplateSet::parse(["%x[0,0]"])
+let trainer = @mooncrf.CrfTrainer::from_dataset(dataset, templates)
+let result = trainer.train(l2=0.01)
+let labels = trainer.predict(result.model(), ["a", "b"])
+```
+
+Prediction reuses the training-time feature index and skips unknown features.
 
 ## License
 

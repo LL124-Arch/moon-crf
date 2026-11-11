@@ -226,3 +226,28 @@ pub fn TemplateSet::extract(
   }
   result
 }
+
+///|
+/// Extracts only feature IDs already present in `index`.
+///
+/// Unknown features are skipped, which lets prediction reuse a training-time
+/// feature space without silently growing it.
+pub fn TemplateSet::extract_known_ids(
+  self : TemplateSet,
+  tokens : Array[String],
+  index : FeatureIndex,
+) -> Array[Array[Int32]] {
+  let names = self.extract(tokens)
+  let result : Array[Array[Int32]] = []
+  for position_features in names {
+    let ids : Array[Int32] = []
+    for name in position_features {
+      match index.get(name) {
+        Some(id) => ids.push(id)
+        None => ()
+      }
+    }
+    result.push(ids)
+  }
+  result
+}

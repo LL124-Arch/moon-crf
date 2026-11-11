@@ -22,6 +22,7 @@ priv struct EncodedSequence {
 ///|
 /// Encodes a dataset and exposes the CRF training objective.
 pub struct CrfTrainer {
+  priv templates : TemplateSet
   priv feature_index : FeatureIndex
   priv label_index : LabelIndex
   priv sequences : Array[EncodedSequence]
@@ -61,6 +62,7 @@ pub fn CrfTrainer::from_dataset(
   let num_labels = label_index.len()
   let num_features = feature_index.len()
   CrfTrainer::{
+    templates,
     feature_index,
     label_index,
     sequences,
@@ -94,6 +96,102 @@ pub fn CrfTrainer::feature_name(self : CrfTrainer, id : Int32) -> String? {
 }
 
 ///|
+/// Encodes tokens with the training-time feature space.
+///
+/// Unknown features are skipped, so prediction never grows the index or
+/// changes the model's parameter layout.
+pub fn CrfTrainer::encode_tokens(
+  self : CrfTrainer,
+  tokens : Array[String],
+) -> Array[Array[Int32]] {
+  self.templates.extract_known_ids(tokens, self.feature_index)
+}
+
+///|
+/// Predicts label strings for a token sequence.
+pub fn CrfTrainer::predict(
+  self : CrfTrainer,
+  model : CrfModel,
+  tokens : Array[String],
+) -> Array[String] raise ModelError {
+  let features = self.encode_tokens(tokens)
+  let result = model.viterbi(features)
+  let labels : Array[String] = []
+  for id in result.labels() {
+    match self.label_index.name(id) {
+      Some(name) => labels.push(name)
+      None => labels.push("")
+    }
+  }
+  labels
+}
+
+///|
+/// Result of training a CRF model.
+pub struct TrainingResult {
+  priv model : CrfModel
+  priv objective : Double
+  priv iterations : Int32
+  priv converged : Bool
+}
+
+///|
+/// The trained model.
+pub fn TrainingResult::model(self : TrainingResult) -> CrfModel {
+  self.model
+}
+
+///|
+/// Final regularized negative log-likelihood.
+pub fn TrainingResult::objective(self : TrainingResult) -> Double {
+  self.objective
+}
+
+///|
+/// Number of L-BFGS iterations completed.
+pub fn TrainingResult::iterations(self : TrainingResult) -> Int32 {
+  self.iterations
+}
+
+///|
+/// Whether the optimizer reached its gradient tolerance.
+pub fn TrainingResult::converged(self : TrainingResult) -> Bool {
+  self.converged
+}
+
+///|
+/// Trains a CRF model with L-BFGS.
+pub fn CrfTrainer::train(
+  self : CrfTrainer,
+  options? : LbfgsOptions,
+  l2~ : Double = 0.0,
+) -> TrainingResult raise OptimizeError {
+  let initial_model = CrfModel::new_unchecked(
+    self.num_labels,
+    self.num_features,
+  )
+  let initial = initial_model.to_parameters()
+  let evaluate = fn(parameters : Array[Double]) -> (Double, Array[Double]) {
+    self.objective_and_gradient_unchecked(parameters, l2)
+  }
+  let result = match options {
+    Some(value) => minimize(initial, evaluate, options=value)
+    None => minimize(initial, evaluate)
+  }
+  let model = CrfModel::from_parameters_unchecked(
+    result.weights().to_owned(),
+    self.num_labels,
+    self.num_features,
+  )
+  TrainingResult::{
+    model,
+    objective: result.value(),
+    iterations: result.iterations(),
+    converged: result.converged(),
+  }
+}
+
+///|
 /// Computes the regularized negative log-likelihood and its gradient.
 ///
 /// The gradient uses the same layout as `CrfModel::to_parameters`.
@@ -103,6 +201,21 @@ pub fn CrfTrainer::objective_and_gradient(
   l2~ : Double = 0.0,
 ) -> (Double, Array[Double]) raise ModelError {
   let model = CrfModel::from_parameters(
+    parameters,
+    self.num_labels,
+    self.num_features,
+  )
+  self.objective_and_gradient_with_model(parameters, model, l2)
+}
+
+///|
+/// Objective and gradient with a known-valid parameter length.
+fn CrfTrainer::objective_and_gradient_unchecked(
+  self : CrfTrainer,
+  parameters : Array[Double],
+  l2 : Double,
+) -> (Double, Array[Double]) {
+  let model = CrfModel::from_parameters_unchecked(
     parameters,
     self.num_labels,
     self.num_features,

@@ -56,3 +56,39 @@ test "rejects an empty training dataset" {
     @mooncrf.TrainError::EmptyDataset => ()
   }
 }
+
+///|
+test "trains a small model and predicts training data" {
+  let dataset = @mooncrf.Dataset::from_conll("a X\nb Y\n\na X\nb Y\n")
+  let templates = @mooncrf.TemplateSet::parse(["%x[0,0]"])
+  let trainer = @mooncrf.CrfTrainer::from_dataset(dataset, templates)
+  let result = trainer.train(l2=0.01)
+  let model = result.model()
+  let predicted = trainer.predict(model, ["a", "b"])
+  assert_eq(predicted.length(), 2)
+  assert_eq(predicted[0], "X")
+  assert_eq(predicted[1], "Y")
+  assert_true(result.objective() >= 0.0)
+  assert_true(result.iterations() > 0)
+}
+
+///|
+test "zero training iterations keep the initial model" {
+  let dataset = @mooncrf.Dataset::from_conll("a X\nb Y\n")
+  let templates = @mooncrf.TemplateSet::parse(["%x[0,0]"])
+  let trainer = @mooncrf.CrfTrainer::from_dataset(dataset, templates)
+  let options = @mooncrf.LbfgsOptions::new(max_iterations=0)
+  let result = trainer.train(options~)
+  assert_eq(result.iterations(), 0)
+  assert_true(!result.converged())
+}
+
+///|
+test "prediction skips unknown features" {
+  let dataset = @mooncrf.Dataset::from_conll("a X\nb Y\n")
+  let templates = @mooncrf.TemplateSet::parse(["%x[0,0]"])
+  let trainer = @mooncrf.CrfTrainer::from_dataset(dataset, templates)
+  let result = trainer.train(l2=0.01)
+  let predicted = trainer.predict(result.model(), ["unseen"])
+  assert_eq(predicted.length(), 1)
+}
