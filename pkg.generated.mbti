@@ -10,6 +10,13 @@ pub suberror DatasetError {
   LengthMismatch(Int, Int)
 }
 
+pub suberror ModelError {
+  NoLabels
+  FeatureOutOfRange(Int, Int)
+  LabelOutOfRange(Int, Int)
+  LengthMismatch(Int, Int)
+}
+
 pub suberror TemplateError {
   EmptyTemplate(Int)
   UnclosedField(Int, Int)
@@ -19,6 +26,22 @@ pub suberror TemplateError {
 }
 
 // Types and methods
+pub struct CrfModel {
+  // private fields
+}
+pub fn CrfModel::log_partition(Self, Array[Array[Int]]) -> Double raise ModelError
+pub fn CrfModel::log_probability(Self, Array[Array[Int]], Array[Int]) -> Double raise ModelError
+pub fn CrfModel::marginals(Self, Array[Array[Int]]) -> Array[Array[Double]] raise ModelError
+pub fn CrfModel::new(Int, Int) -> Self raise ModelError
+pub fn CrfModel::num_features(Self) -> Int
+pub fn CrfModel::num_labels(Self) -> Int
+pub fn CrfModel::score(Self, Array[Array[Int]], Array[Int]) -> Double raise ModelError
+pub fn CrfModel::set_transition(Self, Int, Int, Double) -> Unit raise ModelError
+pub fn CrfModel::set_weight(Self, Int, Int, Double) -> Unit raise ModelError
+pub fn CrfModel::state_score(Self, Array[Int], Int) -> Double raise ModelError
+pub fn CrfModel::transition(Self, Int, Int) -> Double raise ModelError
+pub fn CrfModel::weight(Self, Int, Int) -> Double raise ModelError
+
 pub struct Dataset {
   // private fields
 }

@@ -18,7 +18,7 @@ incrementally, with every feature covered by tests before it is merged.
 - [x] CoNLL-style dataset reader
 - [x] Feature templates and feature extraction
 - [x] Feature index and ID encoding
-- [ ] Forward-backward inference
+- [x] Forward-backward inference
 - [ ] Viterbi decoding
 - [ ] L-BFGS training
 - [ ] Model serialization
@@ -81,6 +81,23 @@ let ids = templates.extract_ids(["Alice", "met", "Bob"], index)
 
 IDs are assigned in first-seen order, so the same feature always receives the
 same ID while an index is being built.
+
+## Scoring and marginals
+
+`CrfModel` stores dense state weights (feature × label) and transition weights
+(label × label). The forward-backward pass runs in log space:
+
+```moonbit
+let model = @mooncrf.CrfModel::new(2, 3)
+model.set_weight(0, 0, 0.5)
+model.set_transition(0, 1, -0.4)
+let features : Array[Array[Int]] = [[0, 1], [1, 2]]
+let log_z = model.log_partition(features)
+let marginals = model.marginals(features)
+```
+
+`marginals` returns one probability row per position, with each row normalized
+to sum to one.
 
 ## License
 
