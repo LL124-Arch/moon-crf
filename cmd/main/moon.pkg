@@ -1,0 +1,8 @@
+import {
+  "LL124-Arch/mooncrf" @lib,
+  "moonbitlang/core/env",
+  "moonbitlang/core/string",
+  "moonbitlang/x/fs",
+}
+
+pkgtype(kind: "executable")

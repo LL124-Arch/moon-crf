@@ -19,3 +19,7 @@ keywords = [ "crf", "sequence-labeling", "nlp", "conditional-random-field" ]
 preferred_target = "wasm"
 
 description = "A pure MoonBit linear-chain conditional random field (CRF) library for sequence labeling."
+
+import {
+  "moonbitlang/x@0.5.7",
+}

@@ -26,7 +26,7 @@ incrementally, with every feature covered by tests before it is merged.
 - [x] CRF training and prediction
 - [x] Model serialization
 - [x] Precision / recall / F1 evaluation
-- [ ] Command-line interface
+- [x] Command-line interface
 - [ ] Published on mooncakes.io
 
 ## Installation
@@ -167,6 +167,16 @@ let text = bundle.to_json_string()
 let loaded = @mooncrf.ModelBundle::from_json_string(text)
 let labels = loaded.predict(["a", "b"])
 ```
+
+## Command-line tool
+
+```bash
+moon run cmd/main -- train examples/sample.conll examples/sample.model.json --l2 0.01 --iterations 100
+moon run cmd/main -- predict examples/sample.model.json examples/sample.conll
+moon run cmd/main -- eval examples/sample.model.json examples/sample.conll
+```
+
+`examples/sample.conll` is a tiny NER-style dataset included for a quick start.
 
 ## License
 

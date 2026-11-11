@@ -17,7 +17,7 @@
 - [x] CRF 训练与预测
 - [x] 模型序列化
 - [x] 精确率 / 召回率 / F1 评测
-- [ ] 命令行工具
+- [x] 命令行工具
 - [ ] 发布到 mooncakes.io
 
 ## 安装
@@ -143,6 +143,16 @@ let text = bundle.to_json_string()
 let loaded = @mooncrf.ModelBundle::from_json_string(text)
 let labels = loaded.predict(["a", "b"])
 ```
+
+## 命令行工具
+
+```bash
+moon run cmd/main -- train examples/sample.conll examples/sample.model.json --l2 0.01 --iterations 100
+moon run cmd/main -- predict examples/sample.model.json examples/sample.conll
+moon run cmd/main -- eval examples/sample.model.json examples/sample.conll
+```
+
+`examples/sample.conll` 是一个很小的 NER 风格示例数据，可直接用来跑通全流程。
 
 ## 参考与许可证
 

@@ -28,3 +28,8 @@ jobs:
 
       - name: Test
         run: moon test --deny-warn
+
+      - name: CLI smoke test
+        run: |
+          moon run cmd/main -- train examples/sample.conll /tmp/mooncrf.model.json --l2 0.01 --iterations 100
+          moon run cmd/main -- eval /tmp/mooncrf.model.json examples/sample.conll
