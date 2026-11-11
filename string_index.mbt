@@ -44,6 +44,22 @@ pub fn StringIndex::name(self : StringIndex, id : Int32) -> String? {
 }
 
 ///|
+/// Original strings in ID order.
+pub fn StringIndex::to_array(self : StringIndex) -> Array[String] {
+  self.names.copy()
+}
+
+///|
+/// Rebuilds an index from strings in ID order.
+pub fn StringIndex::from_array(names : Array[String]) -> StringIndex {
+  let index = StringIndex::new()
+  for name in names {
+    let _ = index.intern(name)
+  }
+  index
+}
+
+///|
 /// Extracts feature IDs for every token position.
 ///
 /// The feature names are produced by `TemplateSet::extract`, then interned in

@@ -7,6 +7,14 @@ pub fn evaluate(Array[String], Array[String]) -> Evaluation raise EvaluationErro
 pub fn minimize(Array[Double], (Array[Double]) -> (Double, Array[Double]), options? : LbfgsOptions) -> LbfgsResult raise OptimizeError
 
 // Errors
+pub suberror BundleError {
+  Version(Int)
+  InvalidField(String)
+  InvalidJson(String)
+  Template(String)
+  Model(String)
+}
+
 pub suberror DatasetError {
   MissingLabel(Int)
   TooManyColumns(Int, Int)
@@ -72,6 +80,7 @@ pub fn CrfTrainer::num_features(Self) -> Int
 pub fn CrfTrainer::num_labels(Self) -> Int
 pub fn CrfTrainer::objective_and_gradient(Self, Array[Double], l2? : Double) -> (Double, Array[Double]) raise ModelError
 pub fn CrfTrainer::predict(Self, CrfModel, Array[String]) -> Array[String] raise ModelError
+pub fn CrfTrainer::to_bundle(Self, CrfModel) -> ModelBundle
 pub fn CrfTrainer::train(Self, options? : LbfgsOptions, l2? : Double) -> TrainingResult raise OptimizeError
 
 pub struct Dataset {
@@ -105,6 +114,15 @@ pub fn LbfgsResult::iterations(Self) -> Int
 pub fn LbfgsResult::value(Self) -> Double
 pub fn LbfgsResult::weights(Self) -> ArrayView[Double]
 
+pub struct ModelBundle {
+  // private fields
+}
+pub fn ModelBundle::from_json(Json) -> Self raise BundleError
+pub fn ModelBundle::from_json_string(String) -> Self raise BundleError
+pub fn ModelBundle::predict(Self, Array[String]) -> Array[String] raise ModelError
+pub fn ModelBundle::to_json(Self) -> Json
+pub fn ModelBundle::to_json_string(Self) -> String
+
 pub struct Sequence {
   // private fields
 }
@@ -118,11 +136,13 @@ pub fn Sequence::tokens(Self) -> ArrayView[String]
 pub struct StringIndex {
   // private fields
 }
+pub fn StringIndex::from_array(Array[String]) -> Self
 pub fn StringIndex::get(Self, String) -> Int?
 pub fn StringIndex::intern(Self, String) -> Int
 pub fn StringIndex::len(Self) -> Int
 pub fn StringIndex::name(Self, Int) -> String?
 pub fn StringIndex::new() -> Self
+pub fn StringIndex::to_array(Self) -> Array[String]
 
 pub struct TemplateSet {
   // private fields
@@ -132,6 +152,7 @@ pub fn TemplateSet::extract_ids(Self, Array[String], StringIndex) -> Array[Array
 pub fn TemplateSet::extract_known_ids(Self, Array[String], StringIndex) -> Array[Array[Int]]
 pub fn TemplateSet::len(Self) -> Int
 pub fn TemplateSet::parse(Array[String]) -> Self raise TemplateError
+pub fn TemplateSet::to_array(Self) -> Array[String]
 
 pub struct TrainingResult {
   // private fields

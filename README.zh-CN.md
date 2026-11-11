@@ -15,7 +15,7 @@
 - [x] Viterbi 解码
 - [x] L-BFGS 优化器
 - [x] CRF 训练与预测
-- [ ] 模型序列化
+- [x] 模型序列化
 - [x] 精确率 / 召回率 / F1 评测
 - [ ] 命令行工具
 - [ ] 发布到 mooncakes.io
@@ -131,6 +131,17 @@ let labels = trainer.predict(result.model(), ["a", "b"])
 let metrics = @mooncrf.evaluate(["X", "Y"], ["X", "X"])
 println(metrics.accuracy())
 println(metrics.f1())
+```
+
+## 保存与加载
+
+`ModelBundle` 把模型、模板字符串、特征索引和标签索引一起保存为 JSON：
+
+```moonbit
+let bundle = trainer.to_bundle(result.model())
+let text = bundle.to_json_string()
+let loaded = @mooncrf.ModelBundle::from_json_string(text)
+let labels = loaded.predict(["a", "b"])
 ```
 
 ## 参考与许可证

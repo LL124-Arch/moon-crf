@@ -15,6 +15,7 @@ priv struct FeatureTemplate {
 /// A reusable set of feature templates.
 pub struct TemplateSet {
   priv templates : Array[FeatureTemplate]
+  priv raw : Array[String]
 }
 
 ///|
@@ -194,7 +195,13 @@ pub fn TemplateSet::parse(
   for index, raw in templates {
     parsed.push(parse_template(index, raw))
   }
-  TemplateSet::{ templates: parsed, }
+  TemplateSet::{ templates: parsed, raw: templates.copy(), }
+}
+
+///|
+/// Original template strings in declaration order.
+pub fn TemplateSet::to_array(self : TemplateSet) -> Array[String] {
+  self.raw.copy()
 }
 
 ///|

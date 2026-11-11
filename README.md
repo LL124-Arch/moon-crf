@@ -24,7 +24,7 @@ incrementally, with every feature covered by tests before it is merged.
 - [x] Viterbi decoding
 - [x] L-BFGS optimizer
 - [x] CRF training and prediction
-- [ ] Model serialization
+- [x] Model serialization
 - [x] Precision / recall / F1 evaluation
 - [ ] Command-line interface
 - [ ] Published on mooncakes.io
@@ -154,6 +154,18 @@ accuracy plus micro-averaged precision, recall, and F1:
 let metrics = @mooncrf.evaluate(["X", "Y"], ["X", "X"])
 println(metrics.accuracy())
 println(metrics.f1())
+```
+
+## Saving and loading
+
+`ModelBundle` serializes the model, template strings, feature index, and label
+index as JSON:
+
+```moonbit
+let bundle = trainer.to_bundle(result.model())
+let text = bundle.to_json_string()
+let loaded = @mooncrf.ModelBundle::from_json_string(text)
+let labels = loaded.predict(["a", "b"])
 ```
 
 ## License
