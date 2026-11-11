@@ -31,6 +31,10 @@ pub suberror TemplateError {
   UnsupportedColumn(Int, Int)
 }
 
+pub suberror TrainError {
+  EmptyDataset
+}
+
 // Types and methods
 pub struct CrfModel {
   // private fields
@@ -50,6 +54,16 @@ pub fn CrfModel::to_parameters(Self) -> Array[Double]
 pub fn CrfModel::transition(Self, Int, Int) -> Double raise ModelError
 pub fn CrfModel::viterbi(Self, Array[Array[Int]]) -> ViterbiResult raise ModelError
 pub fn CrfModel::weight(Self, Int, Int) -> Double raise ModelError
+
+pub struct CrfTrainer {
+  // private fields
+}
+pub fn CrfTrainer::feature_name(Self, Int) -> String?
+pub fn CrfTrainer::from_dataset(Dataset, TemplateSet) -> Self raise TrainError
+pub fn CrfTrainer::label_name(Self, Int) -> String?
+pub fn CrfTrainer::num_features(Self) -> Int
+pub fn CrfTrainer::num_labels(Self) -> Int
+pub fn CrfTrainer::objective_and_gradient(Self, Array[Double], l2? : Double) -> (Double, Array[Double]) raise ModelError
 
 pub struct Dataset {
   // private fields
