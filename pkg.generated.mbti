@@ -16,7 +16,6 @@ pub struct Dataset {
 }
 pub fn Dataset::from_conll(String) -> Self raise DatasetError
 pub fn Dataset::len(Self) -> Int
-pub fn Dataset::parse_conll(String) -> Result[Self, DatasetError]
 pub fn Dataset::sequences(Self) -> ArrayView[Sequence]
 
 pub struct Sequence {
@@ -25,7 +24,7 @@ pub struct Sequence {
 }
 pub fn Sequence::labels(Self) -> ArrayView[String]
 pub fn Sequence::len(Self) -> Int
-pub fn Sequence::new(Array[String], Array[String]) -> Result[Self, DatasetError]
+pub fn Sequence::new(Array[String], Array[String]) -> Self raise DatasetError
 pub fn Sequence::tokens(Self) -> ArrayView[String]
 
 // Type aliases

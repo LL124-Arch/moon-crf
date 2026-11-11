@@ -42,12 +42,11 @@ impl Show for DatasetError with fn output(self, logger) {
 pub fn Sequence::new(
   tokens : Array[String],
   labels : Array[String],
-) -> Result[Sequence, DatasetError] {
+) -> Sequence raise DatasetError {
   if tokens.length() != labels.length() {
-    Err(LengthMismatch(tokens.length(), labels.length()))
-  } else {
-    Ok(Sequence::{ tokens, labels, })
+    raise LengthMismatch(tokens.length(), labels.length())
   }
+  Sequence::{ tokens, labels, }
 }
 
 ///|
@@ -104,12 +103,12 @@ fn split_fields(line : StringView) -> Array[StringView] {
 }
 
 ///|
-/// Parses a CoNLL-style dataset without raising.
+/// Parses a CoNLL-style dataset.
 ///
 /// Each non-empty, non-comment line must contain exactly two whitespace-
 /// separated columns: `token label`. A blank line ends the current sequence.
 /// Lines beginning with `#` are ignored.
-pub fn Dataset::parse_conll(text : String) -> Result[Dataset, DatasetError] {
+pub fn Dataset::from_conll(text : String) -> Dataset raise DatasetError {
   let sequences : Array[Sequence] = []
   let mut tokens : Array[String] = []
   let mut labels : Array[String] = []
@@ -130,26 +129,16 @@ pub fn Dataset::parse_conll(text : String) -> Result[Dataset, DatasetError] {
     }
     let fields = split_fields(line)
     match fields.length() {
-      0 => return Err(MissingLabel(line_no))
-      1 => return Err(MissingLabel(line_no))
+      0 | 1 => raise MissingLabel(line_no)
       2 => {
         tokens.push(fields[0].to_owned())
         labels.push(fields[1].to_owned())
       }
-      n => return Err(TooManyColumns(line_no, n))
+      n => raise TooManyColumns(line_no, n)
     }
   }
   if tokens.length() > 0 {
     sequences.push(Sequence::{ tokens, labels, })
   }
-  Ok(Dataset::{ sequences, })
-}
-
-///|
-/// Parses a CoNLL-style dataset, raising `DatasetError` on malformed input.
-pub fn Dataset::from_conll(text : String) -> Dataset raise DatasetError {
-  match Dataset::parse_conll(text) {
-    Ok(dataset) => dataset
-    Err(err) => raise err
-  }
+  Dataset::{ sequences, }
 }

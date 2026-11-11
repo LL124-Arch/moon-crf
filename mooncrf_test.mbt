@@ -1,4 +1,19 @@
 ///|
+fn expect_parse_error(text : String) -> @mooncrf.DatasetError {
+  let _ = @mooncrf.Dataset::from_conll(text) catch { err => return err }
+  panic()
+}
+
+///|
+fn expect_sequence_error(
+  tokens : Array[String],
+  labels : Array[String],
+) -> @mooncrf.DatasetError {
+  let _ = @mooncrf.Sequence::new(tokens, labels) catch { err => return err }
+  panic()
+}
+
+///|
 test "parses two sequences" {
   let dataset = @mooncrf.Dataset::from_conll(
     "Alice B-PER\nmet O\n\nBob B-PER\n",
@@ -46,16 +61,16 @@ test "flushes the last sequence without a trailing blank line" {
 
 ///|
 test "reports a missing label" {
-  match @mooncrf.Dataset::parse_conll("Alice\n") {
-    Err(@mooncrf.DatasetError::MissingLabel(line)) => assert_eq(line, 1)
+  match expect_parse_error("Alice\n") {
+    @mooncrf.DatasetError::MissingLabel(line) => assert_eq(line, 1)
     _ => panic()
   }
 }
 
 ///|
 test "reports too many columns" {
-  match @mooncrf.Dataset::parse_conll("Alice B-PER extra\n") {
-    Err(@mooncrf.DatasetError::TooManyColumns(line, columns)) => {
+  match expect_parse_error("Alice B-PER extra\n") {
+    @mooncrf.DatasetError::TooManyColumns(line, columns) => {
       assert_eq(line, 1)
       assert_eq(columns, 3)
     }
@@ -65,8 +80,8 @@ test "reports too many columns" {
 
 ///|
 test "rejects sequences with mismatched token and label counts" {
-  match @mooncrf.Sequence::new(["a", "b"], ["X"]) {
-    Err(@mooncrf.DatasetError::LengthMismatch(tokens, labels)) => {
+  match expect_sequence_error(["a", "b"], ["X"]) {
+    @mooncrf.DatasetError::LengthMismatch(tokens, labels) => {
       assert_eq(tokens, 2)
       assert_eq(labels, 1)
     }

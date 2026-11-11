@@ -48,9 +48,7 @@ println(dataset.len()) // 2
 println(dataset.sequences()[0].tokens()[0]) // Alice
 ```
 
-Malformed input raises `DatasetError` with the offending line number. Callers
-that prefer not to raise can use `Dataset::parse_conll`, which returns a
-`Result`.
+Malformed input raises `DatasetError` with the offending line number.
 
 ## License
 
