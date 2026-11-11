@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MoonBit
+        uses: moonbit-community/setup-moonbit@main
+        with:
+          version: latest
+
+      - name: Check formatting
+        run: moon fmt --check
+
+      - name: Check
+        run: moon check --deny-warn --target all
+
+      - name: Build
+        run: moon build --deny-warn
+
+      - name: Test
+        run: moon test --deny-warn
