@@ -2,12 +2,18 @@
 package "LL124-Arch/mooncrf"
 
 // Values
+pub fn evaluate(Array[String], Array[String]) -> Evaluation raise EvaluationError
+
 pub fn minimize(Array[Double], (Array[Double]) -> (Double, Array[Double]), options? : LbfgsOptions) -> LbfgsResult raise OptimizeError
 
 // Errors
 pub suberror DatasetError {
   MissingLabel(Int)
   TooManyColumns(Int, Int)
+  LengthMismatch(Int, Int)
+}
+
+pub suberror EvaluationError {
   LengthMismatch(Int, Int)
 }
 
@@ -74,6 +80,15 @@ pub struct Dataset {
 pub fn Dataset::from_conll(String) -> Self raise DatasetError
 pub fn Dataset::len(Self) -> Int
 pub fn Dataset::sequences(Self) -> ArrayView[Sequence]
+
+pub struct Evaluation {
+  // private fields
+}
+pub fn Evaluation::accuracy(Self) -> Double
+pub fn Evaluation::f1(Self) -> Double
+pub fn Evaluation::precision(Self) -> Double
+pub fn Evaluation::recall(Self) -> Double
+pub fn Evaluation::support(Self) -> Int
 
 pub struct LbfgsOptions {
   // private fields

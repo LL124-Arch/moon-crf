@@ -16,7 +16,7 @@
 - [x] L-BFGS 优化器
 - [x] CRF 训练与预测
 - [ ] 模型序列化
-- [ ] 精确率 / 召回率 / F1 评测
+- [x] 精确率 / 召回率 / F1 评测
 - [ ] 命令行工具
 - [ ] 发布到 mooncakes.io
 
@@ -122,6 +122,16 @@ let labels = trainer.predict(result.model(), ["a", "b"])
 ```
 
 预测时复用训练阶段的特征索引，未知特征会被跳过，不会改变模型参数布局。
+
+## 评测
+
+`evaluate` 对比 gold 与预测标签序列，返回 token 准确率和 micro 平均的精确率、召回率、F1：
+
+```moonbit
+let metrics = @mooncrf.evaluate(["X", "Y"], ["X", "X"])
+println(metrics.accuracy())
+println(metrics.f1())
+```
 
 ## 参考与许可证
 

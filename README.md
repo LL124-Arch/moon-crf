@@ -25,7 +25,7 @@ incrementally, with every feature covered by tests before it is merged.
 - [x] L-BFGS optimizer
 - [x] CRF training and prediction
 - [ ] Model serialization
-- [ ] Precision / recall / F1 evaluation
+- [x] Precision / recall / F1 evaluation
 - [ ] Command-line interface
 - [ ] Published on mooncakes.io
 
@@ -144,6 +144,17 @@ let labels = trainer.predict(result.model(), ["a", "b"])
 ```
 
 Prediction reuses the training-time feature index and skips unknown features.
+
+## Evaluation
+
+`evaluate` compares gold and predicted label sequences and returns token
+accuracy plus micro-averaged precision, recall, and F1:
+
+```moonbit
+let metrics = @mooncrf.evaluate(["X", "Y"], ["X", "X"])
+println(metrics.accuracy())
+println(metrics.f1())
+```
 
 ## License
 
