@@ -26,6 +26,15 @@ pub fn Dataset::from_conll(String) -> Self raise DatasetError
 pub fn Dataset::len(Self) -> Int
 pub fn Dataset::sequences(Self) -> ArrayView[Sequence]
 
+pub struct FeatureIndex {
+  // private fields
+}
+pub fn FeatureIndex::get(Self, String) -> Int?
+pub fn FeatureIndex::intern(Self, String) -> Int
+pub fn FeatureIndex::len(Self) -> Int
+pub fn FeatureIndex::name(Self, Int) -> String?
+pub fn FeatureIndex::new() -> Self
+
 pub struct Sequence {
   // private fields
 }
@@ -38,6 +47,7 @@ pub struct TemplateSet {
   // private fields
 }
 pub fn TemplateSet::extract(Self, Array[String]) -> Array[Array[String]]
+pub fn TemplateSet::extract_ids(Self, Array[String], FeatureIndex) -> Array[Array[Int]]
 pub fn TemplateSet::len(Self) -> Int
 pub fn TemplateSet::parse(Array[String]) -> Self raise TemplateError
 

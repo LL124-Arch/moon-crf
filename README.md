@@ -17,6 +17,7 @@ incrementally, with every feature covered by tests before it is merged.
 
 - [x] CoNLL-style dataset reader
 - [x] Feature templates and feature extraction
+- [x] Feature index and ID encoding
 - [ ] Forward-backward inference
 - [ ] Viterbi decoding
 - [ ] L-BFGS training
@@ -67,6 +68,19 @@ let features = templates.extract(["Alice", "met", "Bob"])
 
 Out-of-range references are skipped, so the first token does not produce a
 `%x[-1,0]` feature. Literal text and `%%` escaping are supported.
+
+## Feature IDs
+
+`FeatureIndex` assigns stable integer IDs to feature names, and
+`TemplateSet::extract_ids` combines extraction and interning:
+
+```moonbit
+let index = @mooncrf.FeatureIndex::new()
+let ids = templates.extract_ids(["Alice", "met", "Bob"], index)
+```
+
+IDs are assigned in first-seen order, so the same feature always receives the
+same ID while an index is being built.
 
 ## License
 
