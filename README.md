@@ -19,7 +19,7 @@ incrementally, with every feature covered by tests before it is merged.
 - [x] Feature templates and feature extraction
 - [x] Feature index and ID encoding
 - [x] Forward-backward inference
-- [ ] Viterbi decoding
+- [x] Viterbi decoding
 - [ ] L-BFGS training
 - [ ] Model serialization
 - [ ] Precision / recall / F1 evaluation
@@ -98,6 +98,17 @@ let marginals = model.marginals(features)
 
 `marginals` returns one probability row per position, with each row normalized
 to sum to one.
+
+## Viterbi decoding
+
+```moonbit
+let result = model.viterbi(features)
+println(result.labels())
+println(result.score())
+```
+
+Ties are resolved in favor of the smallest label index, so decoding is
+deterministic.
 
 ## License
 
