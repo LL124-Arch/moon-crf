@@ -4,14 +4,14 @@
 /// Sequences are immutable from the outside: construct them with
 /// `Sequence::new` and read them through `tokens` and `labels`.
 pub struct Sequence {
-  tokens : Array[String]
-  labels : Array[String]
+  priv tokens : Array[String]
+  priv labels : Array[String]
 }
 
 ///|
 /// A collection of labeled sequences.
 pub struct Dataset {
-  sequences : Array[Sequence]
+  priv sequences : Array[Sequence]
 }
 
 ///|

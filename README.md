@@ -16,7 +16,7 @@ incrementally, with every feature covered by tests before it is merged.
 ## Roadmap
 
 - [x] CoNLL-style dataset reader
-- [ ] Feature templates and feature extraction
+- [x] Feature templates and feature extraction
 - [ ] Forward-backward inference
 - [ ] Viterbi decoding
 - [ ] L-BFGS training
@@ -49,6 +49,24 @@ println(dataset.sequences()[0].tokens()[0]) // Alice
 ```
 
 Malformed input raises `DatasetError` with the offending line number.
+
+## Feature templates
+
+Templates use `%x[row,column]` references, where `row` is relative to the
+current token and `column` is the token field. The current data model is
+single-field, so only column `0` is accepted.
+
+```moonbit
+let templates = @mooncrf.TemplateSet::parse([
+  "%x[0,0]",
+  "%x[-1,0]/%x[0,0]",
+])
+let features = templates.extract(["Alice", "met", "Bob"])
+// Position 1 contains "t0:met", "t1:Alice/met", and the bias feature "b".
+```
+
+Out-of-range references are skipped, so the first token does not produce a
+`%x[-1,0]` feature. Literal text and `%%` escaping are supported.
 
 ## License
 

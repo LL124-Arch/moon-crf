@@ -10,22 +10,36 @@ pub suberror DatasetError {
   LengthMismatch(Int, Int)
 }
 
+pub suberror TemplateError {
+  EmptyTemplate(Int)
+  UnclosedField(Int, Int)
+  UnexpectedToken(Int, Int)
+  InvalidNumber(Int, Int)
+  UnsupportedColumn(Int, Int)
+}
+
 // Types and methods
 pub struct Dataset {
-  sequences : Array[Sequence]
+  // private fields
 }
 pub fn Dataset::from_conll(String) -> Self raise DatasetError
 pub fn Dataset::len(Self) -> Int
 pub fn Dataset::sequences(Self) -> ArrayView[Sequence]
 
 pub struct Sequence {
-  tokens : Array[String]
-  labels : Array[String]
+  // private fields
 }
 pub fn Sequence::labels(Self) -> ArrayView[String]
 pub fn Sequence::len(Self) -> Int
 pub fn Sequence::new(Array[String], Array[String]) -> Self raise DatasetError
 pub fn Sequence::tokens(Self) -> ArrayView[String]
+
+pub struct TemplateSet {
+  // private fields
+}
+pub fn TemplateSet::extract(Self, Array[String]) -> Array[Array[String]]
+pub fn TemplateSet::len(Self) -> Int
+pub fn TemplateSet::parse(Array[String]) -> Self raise TemplateError
 
 // Type aliases
 
