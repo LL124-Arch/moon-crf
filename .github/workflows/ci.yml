@@ -17,6 +17,9 @@ jobs:
         with:
           version: latest
 
+      - name: Update registry
+        run: moon update
+
       - name: Check formatting
         run: moon fmt --check
 
