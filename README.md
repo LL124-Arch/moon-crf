@@ -1,5 +1,7 @@
 # mooncrf
 
+[中文说明](README.zh-CN.md) | English
+
 A pure MoonBit implementation of linear-chain conditional random fields (CRF)
 for sequence labeling.
 
@@ -20,7 +22,8 @@ incrementally, with every feature covered by tests before it is merged.
 - [x] Feature index and ID encoding
 - [x] Forward-backward inference
 - [x] Viterbi decoding
-- [ ] L-BFGS training
+- [x] L-BFGS optimizer
+- [ ] CRF training objective
 - [ ] Model serialization
 - [ ] Precision / recall / F1 evaluation
 - [ ] Command-line interface
@@ -109,6 +112,21 @@ println(result.score())
 
 Ties are resolved in favor of the smallest label index, so decoding is
 deterministic.
+
+## L-BFGS optimizer
+
+`minimize` is a standalone L-BFGS minimizer. It takes an initial parameter
+vector and a callback returning the objective value and gradient, so it can be
+tested independently of the CRF model.
+
+```moonbit
+let result = @mooncrf.minimize([1.0, 1.0], quadratic)
+println(result.converged())
+println(result.iterations())
+```
+
+The optimizer uses the two-loop recursion, Armijo backtracking, and a
+first-step scaling based on the gradient norm.
 
 ## License
 

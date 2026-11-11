@@ -2,6 +2,7 @@
 package "LL124-Arch/mooncrf"
 
 // Values
+pub fn minimize(Array[Double], (Array[Double]) -> (Double, Array[Double]), options? : LbfgsOptions) -> LbfgsResult raise OptimizeError
 
 // Errors
 pub suberror DatasetError {
@@ -15,6 +16,10 @@ pub suberror ModelError {
   FeatureOutOfRange(Int, Int)
   LabelOutOfRange(Int, Int)
   LengthMismatch(Int, Int)
+}
+
+pub suberror OptimizeError {
+  DimensionMismatch(Int, Int)
 }
 
 pub suberror TemplateError {
@@ -58,6 +63,21 @@ pub fn FeatureIndex::intern(Self, String) -> Int
 pub fn FeatureIndex::len(Self) -> Int
 pub fn FeatureIndex::name(Self, Int) -> String?
 pub fn FeatureIndex::new() -> Self
+
+pub struct LbfgsOptions {
+  // private fields
+}
+pub fn LbfgsOptions::default() -> Self
+pub fn LbfgsOptions::new(max_iterations? : Int, memory? : Int, tolerance? : Double, line_search_steps? : Int) -> Self
+
+pub struct LbfgsResult {
+  // private fields
+}
+pub fn LbfgsResult::converged(Self) -> Bool
+pub fn LbfgsResult::gradient_norm(Self) -> Double
+pub fn LbfgsResult::iterations(Self) -> Int
+pub fn LbfgsResult::value(Self) -> Double
+pub fn LbfgsResult::weights(Self) -> ArrayView[Double]
 
 pub struct Sequence {
   // private fields
