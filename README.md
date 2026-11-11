@@ -15,7 +15,7 @@ incrementally, with every feature covered by tests before it is merged.
 
 ## Roadmap
 
-- [ ] CoNLL-style dataset reader
+- [x] CoNLL-style dataset reader
 - [ ] Feature templates and feature extraction
 - [ ] Forward-backward inference
 - [ ] Viterbi decoding
@@ -30,6 +30,27 @@ incrementally, with every feature covered by tests before it is merged.
 ```bash
 moon add LL124-Arch/mooncrf
 ```
+
+## Reading a CoNLL dataset
+
+`mooncrf` reads the common two-column CoNLL layout: one `token label` pair per
+line, a blank line between sequences, and `#` for comments.
+
+```moonbit
+import {
+  "LL124-Arch/mooncrf",
+}
+
+let dataset = @mooncrf.Dataset::from_conll(
+  "Alice B-PER\nmet O\n\nBob B-PER\n",
+)
+println(dataset.len()) // 2
+println(dataset.sequences()[0].tokens()[0]) // Alice
+```
+
+Malformed input raises `DatasetError` with the offending line number. Callers
+that prefer not to raise can use `Dataset::parse_conll`, which returns a
+`Result`.
 
 ## License
 

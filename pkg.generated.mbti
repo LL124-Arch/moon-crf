@@ -1,0 +1,33 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "LL124-Arch/mooncrf"
+
+// Values
+
+// Errors
+pub suberror DatasetError {
+  MissingLabel(Int)
+  TooManyColumns(Int, Int)
+  LengthMismatch(Int, Int)
+}
+
+// Types and methods
+pub struct Dataset {
+  sequences : Array[Sequence]
+}
+pub fn Dataset::from_conll(String) -> Self raise DatasetError
+pub fn Dataset::len(Self) -> Int
+pub fn Dataset::parse_conll(String) -> Result[Self, DatasetError]
+pub fn Dataset::sequences(Self) -> ArrayView[Sequence]
+
+pub struct Sequence {
+  tokens : Array[String]
+  labels : Array[String]
+}
+pub fn Sequence::labels(Self) -> ArrayView[String]
+pub fn Sequence::len(Self) -> Int
+pub fn Sequence::new(Array[String], Array[String]) -> Result[Self, DatasetError]
+pub fn Sequence::tokens(Self) -> ArrayView[String]
+
+// Type aliases
+
+// Traits
